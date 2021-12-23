@@ -14,8 +14,9 @@ var mYear = 0
 var mMonth : Int = 0
 var mDay : Int = 0
 
+val DATE_FORMAT_ddMMYYYY ="dd-MM-yyyy"
 fun getCurrentDate() : String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd")
+    val sdf = SimpleDateFormat(DATE_FORMAT_ddMMYYYY)
 
 
     val c = Calendar.getInstance();
@@ -30,7 +31,7 @@ fun getDateFromString(dateAsString:String):Date?
 {
 
     var date:Date?=null
-    val format = SimpleDateFormat("yyyy-MM-dd")
+    val format = SimpleDateFormat(DATE_FORMAT_ddMMYYYY)
     try {
         date= format.parse(dateAsString)
         System.out.println(date)
@@ -50,7 +51,7 @@ fun pickDate(baseActivity : Activity?, editText : EditText?) {
                     mMonth = monthOfYear
                     mDay = dayOfMonth
                     val inputFormat : DateFormat = SimpleDateFormat("yyyy-MM-dd")
-                    val outputFormat : DateFormat = SimpleDateFormat("yyyy-MM-dd")
+                    val outputFormat : DateFormat = SimpleDateFormat(DATE_FORMAT_ddMMYYYY)
                     val inputDateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
                     var date : Date? = null
                     date = inputFormat.parse(inputDateStr)

@@ -8,7 +8,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 import kotlin.collections.ArrayList
-
+//https://docs.google.com/document/u/0/d/1X8ZKPd8pLLBlxyPiaw4DZz-oGSsOW_UMYoF8Ap5Eq8Q/mobilebasic
 object RetrofitMethods : RetrofitManger<ApiEndPoints>() {
 
     override var baseUrl : String = "https://appsonline.in/star/api/"
