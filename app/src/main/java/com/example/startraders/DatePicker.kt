@@ -14,7 +14,7 @@ var mYear = 0
 var mMonth : Int = 0
 var mDay : Int = 0
 
-val DATE_FORMAT_ddMMYYYY ="dd-MM-yyyy"
+val DATE_FORMAT_ddMMYYYY ="yyyy-MM-dd"
 fun getCurrentDate() : String {
     val sdf = SimpleDateFormat(DATE_FORMAT_ddMMYYYY)
 
