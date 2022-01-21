@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item
+        android:title="@string/versionName"
+        android:titleCondensed="@string/cucumber"
+        android:id="@+id/version"
+        app:showAsAction="withText"
+        />
+    <item
         android:id="@+id/statement"
         android:orderInCategory="100"
         android:title="Statement Request"

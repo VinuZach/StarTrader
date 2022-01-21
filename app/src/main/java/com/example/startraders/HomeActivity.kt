@@ -3,6 +3,7 @@ package com.example.startraders
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,6 +25,12 @@ import com.example.startraders.models.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import java.util.*
+import android.text.style.ForegroundColorSpan
+
+import android.text.SpannableString
+
+
+
 
 /**
  * Home activity
@@ -583,6 +590,7 @@ class HomeActivity : AppCompatActivity()
         Log.d(TAG, "onCreate: left end " + leftEnd)
         Log.d(TAG, "onCreate: right end " + rightEnd)
         val newReceiptNumber = leftEnd + (incrementingValue.toInt() + 1) + rightEnd
+      //  val newReceiptNumber = leftEnd + (incrementingValue.toInt() ) + rightEnd
 
         Log.d(TAG, "increamentReceiptNumber: " + newReceiptNumber)
 
@@ -917,6 +925,10 @@ class HomeActivity : AppCompatActivity()
     override fun onCreateOptionsMenu(menu: Menu?): Boolean
     {
         menuInflater.inflate(R.menu.home_menu, menu)
+
+        val s = SpannableString("Version "+getString(R.string.versionName))
+        s.setSpan(ForegroundColorSpan(Color.BLUE), 0, s.length, 0)
+        menu?.findItem(R.id.version)?.setTitle(s)
         return true
     }
 

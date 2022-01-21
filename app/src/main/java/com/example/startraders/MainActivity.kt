@@ -133,121 +133,125 @@ class MainActivity : AppCompatActivity()
         var passwordVisibility by remember { mutableStateOf(false) }
         var isEditDisabled by remember { mutableStateOf(false) }
 
-        Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp).border(1.dp, colorPrimaryDark),
-            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp).border(1.dp, colorPrimaryDark),
+                verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Column(modifier = Modifier.fillMaxWidth()
-                // margin
-                .background(color = colorPrimary).border(2.dp, Color.Transparent) // outer border
-                .padding(8.dp) // space between the borders
-                .border(2.dp, Color.Transparent) // inner border
-                .padding(8.dp)) {
-                Column {
-                    Text(text = "Sign In", fontFamily = fontFamily, fontSize = 15.sp, color = Color.Black, fontWeight = FontWeight.Medium,
-                        modifier = Modifier.fillMaxWidth())
+                Column(modifier = Modifier.fillMaxWidth()
+                    // margin
+                    .background(color = colorPrimary).border(2.dp, Color.Transparent) // outer border
+                    .padding(8.dp) // space between the borders
+                    .border(2.dp, Color.Transparent) // inner border
+                    .padding(8.dp)) {
+                    Column {
+                        Text(text = "Sign In", fontFamily = fontFamily, fontSize = 15.sp, color = Color.Black, fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+
+
                 }
 
+                Column(modifier = Modifier.background(Color.White)) {
 
-            }
+                    val localFocusManager = LocalFocusManager.current
 
-            Column(modifier = Modifier.background(Color.White)) {
+                    OutlinedTextField(colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorPrimaryDark,
+                        unfocusedBorderColor = colorPrimary), value = userName, maxLines = 1,
 
-                val localFocusManager = LocalFocusManager.current
+                        onValueChange = {
+                            userName = it.trim()
+                        }, label = {
+                            Text("E-mail", fontFamily = fontFamily, fontWeight = FontWeight.Medium, color = colorPrimaryDark)
+                        },
 
-                OutlinedTextField(colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorPrimaryDark,
-                    unfocusedBorderColor = colorPrimary), value = userName, maxLines = 1,
+                        modifier = Modifier.fillMaxWidth().padding(top = 10.dp).padding(10.dp), readOnly = isEditDisabled,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(onNext = { localFocusManager.moveFocus(FocusDirection.Down) }))
 
-                    onValueChange = {
-                        userName = it.trim()
-                    }, label = {
-                        Text("E-mail", fontFamily = fontFamily, fontWeight = FontWeight.Medium, color = colorPrimaryDark)
-                    },
+                    OutlinedTextField(colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorPrimaryDark,
+                        unfocusedBorderColor = colorPrimary), value = password, maxLines = 1,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { localFocusManager.moveFocus(FocusDirection.Down) }),
+                        readOnly = isEditDisabled, visualTransformation = if (passwordVisibility) VisualTransformation.None
+                        else PasswordVisualTransformation(), onValueChange = {
+                            password = it.trim()
+                        }, trailingIcon = {
+                            val image = if (passwordVisibility) Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
 
-                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp).padding(10.dp), readOnly = isEditDisabled,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(onNext = { localFocusManager.moveFocus(FocusDirection.Down) }))
+                            IconButton(onClick = {
+                                passwordVisibility = !passwordVisibility
+                            }) {
+                                Icon(imageVector = image, "")
+                            }
+                        }, label = {
+                            Text("Password", fontFamily = fontFamily, fontWeight = FontWeight.Medium,
 
-                OutlinedTextField(colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorPrimaryDark,
-                    unfocusedBorderColor = colorPrimary), value = password, maxLines = 1,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { localFocusManager.moveFocus(FocusDirection.Down) }),
-                    readOnly = isEditDisabled, visualTransformation = if (passwordVisibility) VisualTransformation.None
-                    else PasswordVisualTransformation(), onValueChange = {
-                        password = it.trim()
-                    }, trailingIcon = {
-                        val image = if (passwordVisibility) Icons.Filled.Visibility
-                        else Icons.Filled.VisibilityOff
+                                color = colorPrimaryDark)
+                        },
 
-                        IconButton(onClick = {
-                            passwordVisibility = !passwordVisibility
-                        }) {
-                            Icon(imageVector = image, "")
-                        }
-                    }, label = {
-                        Text("Password", fontFamily = fontFamily, fontWeight = FontWeight.Medium,
+                        modifier = Modifier.fillMaxWidth().padding(top = 0.dp).padding(10.dp))
 
-                            color = colorPrimaryDark)
-                    },
+                }
+                Button(onClick = {
 
-                    modifier = Modifier.fillMaxWidth().padding(top = 0.dp).padding(10.dp))
-
-            }
-            Button(onClick = {
-
-                if (isUserNameValid && isPasswordValid)
-                {
-                    isBoxVisible = 1f
-                    isEditDisabled = true
-                    RepositoryManager.retrofitObject.verifyUser(userName, password, object : RetrofitManger.ApiResponse
+                    if (isUserNameValid && isPasswordValid)
                     {
-                        override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
+                        isBoxVisible = 1f
+                        isEditDisabled = true
+                        RepositoryManager.retrofitObject.verifyUser(userName, password, object : RetrofitManger.ApiResponse
                         {
-                            isBoxVisible = 0f
-                            isEditDisabled = false
-                            if (isSuccess)
+                            override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
                             {
-                                val loginResponse = responseData as LoginResponse
-                                RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, IS_USER_LOGGED_IN, true)
-                                RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, INVOICE_ID,
-                                    data = loginResponse.newInvoice)
+                                isBoxVisible = 0f
+                                isEditDisabled = false
+                                if (isSuccess)
+                                {
+                                    val loginResponse = responseData as LoginResponse
+                                    RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, IS_USER_LOGGED_IN, true)
+                                    RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, INVOICE_ID,
+                                        data = loginResponse.newInvoice)
 
-                                RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, COLLECTION_AGENT_ID,
-                                    data = loginResponse.id)
+                                    RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, COLLECTION_AGENT_ID,
+                                        data = loginResponse.id)
 
-                                startActivity(Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                                finish()
+                                    startActivity(Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                                    finish()
+                                }
+                                else
+                                {
+                                    val errorMessage = responseData as String
+                                    Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                                }
+
                             }
-                            else
-                            {
-                                val errorMessage = responseData as String
-                                Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_SHORT).show()
-                            }
 
-                        }
-
-                    })
-                    Log.d("ererhe", "userName: " + userName)
-                    Log.d("ererhe", "password: " + password)
+                        })
+                        Log.d("ererhe", "userName: " + userName)
+                        Log.d("ererhe", "password: " + password)
 
 
+                    }
+
+                },
+
+                    modifier = Modifier.padding(10.dp).padding(20.dp).fillMaxWidth(),
+                    colors = ButtonDefaults.textButtonColors(backgroundColor = buttonColor), enabled = checkEnteredValues,
+                    border = buttonBorder) {
+                    Text(
+                        text = "Submit",
+                        color = buttonTextColor,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp),
+                        )
                 }
 
-            },
-
-                modifier = Modifier.padding(10.dp).padding(20.dp).fillMaxWidth(),
-                colors = ButtonDefaults.textButtonColors(backgroundColor = buttonColor), enabled = checkEnteredValues,
-                border = buttonBorder) {
-                Text(
-                    text = "Submit",
-                    color = buttonTextColor,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(10.dp),
-                    )
             }
-
-
+            Text(text = "Version " + getString(R.string.versionName), modifier = Modifier.padding(top = 30.dp))
         }
+
+
 
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().alpha(isBoxVisible).background(lightGrey)
 
