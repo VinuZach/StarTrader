@@ -10,17 +10,9 @@
     <string name="retrieving_customer_list">Retrieving customer List</string>
     <string name="user_logging_out">Logging out</string>
     <string name="receipt_statement_request">Requesting statement </string>
+    <string name="outstanding_bal_label">Outstanding Balance : </string>
 
-    <string-array name="Languages">
-        <item>Java</item>
-        <item>Kotlin</item>
-        <item>Swift</item>
-        <item>Python</item>
-        <item>Scala</item>
-        <item>Perl</item>
-        <item>Javascript</item>
-        <item>Jquery</item>
-    </string-array>
+
 
 
     <string-array name="denominationvalue">

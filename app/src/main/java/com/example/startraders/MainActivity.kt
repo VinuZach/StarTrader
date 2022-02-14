@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.example.startraders.HomeActivity.Companion.getModifiedReceiptNumber
 import com.example.startraders.Repository.RetrofitManger
 import com.example.startraders.Repository.SharedPrefData.Companion.COLLECTION_AGENT_ID
 import com.example.startraders.Repository.SharedPrefData.Companion.INVOICE_ID
@@ -209,8 +210,10 @@ class MainActivity : AppCompatActivity()
                                 {
                                     val loginResponse = responseData as LoginResponse
                                     RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, IS_USER_LOGGED_IN, true)
+
+
                                     RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, INVOICE_ID,
-                                        data = loginResponse.newInvoice)
+                                        data = getModifiedReceiptNumber(loginResponse.newInvoice,loginResponse.id,false))
 
                                     RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, COLLECTION_AGENT_ID,
                                         data = loginResponse.id)

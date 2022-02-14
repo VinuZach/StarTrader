@@ -28,9 +28,21 @@ import java.util.*
 import android.text.style.ForegroundColorSpan
 
 import android.text.SpannableString
+import android.text.Html
 
+import android.R.id
+import android.graphics.Typeface
+import android.icu.lang.UProperty
+import android.widget.TextView
 
+import android.text.Spannable
 
+import android.icu.lang.UProperty.INT_START
+
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
+import android.R.id.text2
+import android.content.Context
 
 /**
  * Home activity
@@ -93,6 +105,7 @@ class HomeActivity : AppCompatActivity()
 
     lateinit var discountDetails: DiscountModel
     lateinit var discountAmtTextInputEditText: TextInputEditText
+    lateinit var outStandingBal_Parent: LinearLayout
     val printerManger = PrinterManger()
 
     var outStandingBalance: String? = null
@@ -114,6 +127,7 @@ class HomeActivity : AppCompatActivity()
 
         collectionAgent_id = RepositoryManager.sharedPrefData.getDataWithoutLiveData(this, COLLECTION_AGENT_ID, "")
         invoiceID = RepositoryManager.sharedPrefData.getDataWithoutLiveData(this, INVOICE_ID, "")
+
         findViewById<TextInputEditText>(R.id.invoiceid).setText(invoiceID)
         retrieveCustomer()
         cashAmountMutableData.observe(this, androidx.lifecycle.Observer {
@@ -137,11 +151,11 @@ class HomeActivity : AppCompatActivity()
 
         }
 
-        receiptDateTextInputEditText.setOnClickListener {
-            Log.d("asdsdwe", "onCreate: ")
-            pickDate(HomeActivity@ this, receiptDateTextInputEditText)
-
-        }
+//        receiptDateTextInputEditText.setOnClickListener {
+//            Log.d("asdsdwe", "onCreate: ")
+//            pickDate(HomeActivity@ this, receiptDateTextInputEditText)
+//
+//        }
 
         Log.d("asdsdwe", "onCreate: " + getCurrentDate())
         receiptDateTextInputEditText.setText(getCurrentDate())
@@ -458,7 +472,9 @@ class HomeActivity : AppCompatActivity()
             selectedCustomerDetails = parent.getItemAtPosition(position) as CustomerDetails
             Log.d("Asdwe", "onCreate: " + selectedCustomerDetails?.customerName)
             Log.d("Asdwe", "onCreate: " + selectedCustomerDetails?.id)
-            retreiveDiscountDates(selectedCustomerDetails!!)
+            outStandingBal_Parent.visibility = View.GONE
+            retrieveOutstandingBalance()
+
 
         }
     }
@@ -580,22 +596,13 @@ class HomeActivity : AppCompatActivity()
      */
     private fun incrementReceiptNumber()
     {
+
+        val TAG: String = "ceu343kk"
+
+
         Log.d(TAG, "orginal onCreate: " + invoiceID)
 
-        val incrementingValue: String = invoiceID.substring(invoiceID.indexOf("-") + 1, invoiceID.indexOf("/"))
-        val leftEnd: String = invoiceID.substring(0, invoiceID.indexOf("-") + 1)
-        val rightEnd: String = invoiceID.substring(invoiceID.indexOf("/"), invoiceID.length)
-
-        Log.d(TAG, "onCreate: incrementingValue " + incrementingValue)
-        Log.d(TAG, "onCreate: left end " + leftEnd)
-        Log.d(TAG, "onCreate: right end " + rightEnd)
-        val newReceiptNumber = leftEnd + (incrementingValue.toInt() + 1) + rightEnd
-      //  val newReceiptNumber = leftEnd + (incrementingValue.toInt() ) + rightEnd
-
-        Log.d(TAG, "increamentReceiptNumber: " + newReceiptNumber)
-
-        RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@HomeActivity, INVOICE_ID, data = newReceiptNumber)
-
+        RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@HomeActivity, INVOICE_ID, data = getModifiedReceiptNumber(invoiceID,collectionAgent_id))
         val paymentMode: String
         if (cashToggleButton.isChecked) paymentMode = "Cash"
         else if (chequeToggleButton.isChecked) paymentMode = "Cheque"
@@ -605,6 +612,7 @@ class HomeActivity : AppCompatActivity()
 
 
     }
+
 
     /**
      * Reset ui
@@ -616,6 +624,7 @@ class HomeActivity : AppCompatActivity()
         invoiceID = RepositoryManager.sharedPrefData.getDataWithoutLiveData(this, INVOICE_ID, "")
         findViewById<TextInputEditText>(R.id.invoiceid).setText(invoiceID)
         totalCashAmount = 0.0
+        outStandingBal_Parent.visibility = View.GONE
         selectedCashDenomination.removeAllViews()
         cashAmountMutableData.postValue(totalCashAmount)
         totalAmountAutoComplete.text.clear()
@@ -640,10 +649,10 @@ class HomeActivity : AppCompatActivity()
      *
      * @param selectedCustomerDetails
      */
-    private fun retreiveDiscountDates(selectedCustomerDetails: CustomerDetails)
+    private fun retreiveDiscountDates()
     {
 
-        RepositoryManager.retrofitObject.retrieveCustomerDiscountDate(selectedCustomerDetails.id, object : RetrofitManger.ApiResponse
+        RepositoryManager.retrofitObject.retrieveCustomerDiscountDate(selectedCustomerDetails!!.id, object : RetrofitManger.ApiResponse
         {
             override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
             {
@@ -663,7 +672,7 @@ class HomeActivity : AppCompatActivity()
                 prevReceiptDateTextInputEditText.setOnClickListener {
                     prevReceiptDateTextInputEditText.showDropDown()
                 }
-                retrieveOutstandingBalance()
+
             }
 
         })
@@ -671,7 +680,7 @@ class HomeActivity : AppCompatActivity()
         prevReceiptDateTextInputEditText.setOnItemClickListener { parent, view, position, id ->
             val prevReceiptDate = parent.getItemAtPosition(position) as String
 
-            RepositoryManager.retrofitObject.retrieveCustomerPrevReceipt(selectedCustomerDetails.id, prevReceiptDate,
+            RepositoryManager.retrofitObject.retrieveCustomerPrevReceipt(selectedCustomerDetails!!.id, prevReceiptDate,
                 object : RetrofitManger.ApiResponse
                 {
                     override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
@@ -723,18 +732,21 @@ class HomeActivity : AppCompatActivity()
         {
             override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
             {
+
                 if (isSuccess)
                 {
                     val response = responseData as CustomerOutResponse
                     Log.d(TAG, "onResponseObtained: " + response.date?.outstandingBalance)
                     outStandingBalance = response.date?.outstandingBalance
-
+                    outStandingBal_Parent.visibility = View.VISIBLE
+                    findViewById<TextView>(R.id.outstandingbal).text = outStandingBalance
                 }
                 else
                 {
                     val errorMessage = responseData as String
                     Toast.makeText(this@HomeActivity, "NO ", Toast.LENGTH_SHORT).show()
                 }
+                retreiveDiscountDates()
             }
 
         })
@@ -785,9 +797,7 @@ class HomeActivity : AppCompatActivity()
         discountAmtTextInputEditText = findViewById(R.id.prevrecieptamt)
 
 
-
-
-
+        outStandingBal_Parent = findViewById<LinearLayout>(R.id.outstandingpar)
 
         cashToggleButton = findViewById(R.id.cashtoggle)
         chequeToggleButton = findViewById(R.id.chequetoggle)
@@ -926,7 +936,7 @@ class HomeActivity : AppCompatActivity()
     {
         menuInflater.inflate(R.menu.home_menu, menu)
 
-        val s = SpannableString("Version "+getString(R.string.versionName))
+        val s = SpannableString("Version " + getString(R.string.versionName))
         s.setSpan(ForegroundColorSpan(Color.BLUE), 0, s.length, 0)
         menu?.findItem(R.id.version)?.setTitle(s)
         return true
@@ -1092,6 +1102,12 @@ class HomeActivity : AppCompatActivity()
 
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.dialog_submitconfimation)
+        val messageTextView: TextView = dialog.findViewById(R.id.confirmtext)
+
+
+
+        messageTextView.text = "Total received amount is "
+        messageTextView.append(getColoredString(this, "Rs. " + totalAmountAutoComplete.text, ContextCompat.getColor(this, R.color.black)));
         dialog.findViewById<AppCompatButton>(R.id.confirm).setOnClickListener {
 
             dialog.cancel()
@@ -1105,6 +1121,13 @@ class HomeActivity : AppCompatActivity()
 
         dialog.show()
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    fun getColoredString(context: Context?, text: CharSequence?, color: Int): Spannable
+    {
+        val spannable: Spannable = SpannableString(text)
+        spannable.setSpan(ForegroundColorSpan(color), 0, spannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannable
     }
 
     fun displayOverLayMessage(message: String)
@@ -1172,5 +1195,56 @@ class HomeActivity : AppCompatActivity()
             }
 
         })
+    }
+
+    companion object
+    {
+        val TAG: String = "sadtrthg"
+        fun getModifiedReceiptNumber(invoiceID: String, collectionAgent_id: String, toIncrement: Boolean = true):String
+        {
+            val splitValue = invoiceID.split("-")
+            val newReceiptNumber: String
+            val incrementValue: Int
+            if (toIncrement) incrementValue = 1
+            else incrementValue = 0
+            Log.d(TAG, "incrementReceiptNumber: " + splitValue)
+            val leftSplit = splitValue[0].split("*")
+            Log.d(TAG, "incrementReceiptNumber: " + leftSplit)
+            val leftEnd: String
+            val rightEnd: String
+            val incrementingValue: String
+            if (leftSplit.size >= 2)
+            {
+                leftEnd=collectionAgent_id+"**"+  splitValue[0].split("*")[splitValue[0].split("*").size-1]
+
+                Log.d(TAG, "getModifiedReceiptNumber: "+             splitValue[0].split("*"))
+
+                val rightSplit = splitValue[splitValue.size - 1].split("/")
+                rightEnd = rightSplit[rightSplit.size - 1]
+                incrementingValue = rightSplit[0]
+                newReceiptNumber = leftEnd + "-" + (incrementingValue.toInt() + incrementValue) + "/" + rightEnd
+                Log.d(TAG, "onCreate: left end " + leftEnd)
+                Log.d(TAG, "onCreate: incrementingValue " + incrementingValue)
+                Log.d(TAG, "onCreate:rightEnd " + rightEnd)
+                Log.i(TAG, "increamentReceiptNumber: " + newReceiptNumber)
+            }
+            else
+            {
+
+                incrementingValue = invoiceID.substring(invoiceID.indexOf("-") + 1, invoiceID.indexOf("/"))
+                leftEnd = invoiceID.substring(0, invoiceID.indexOf("-") + 1)
+                rightEnd = invoiceID.substring(invoiceID.indexOf("/"), invoiceID.length)
+
+                Log.d(TAG, "onCreate2: incrementingValue " + incrementingValue)
+                Log.d(TAG, "onCreate2: left end " + leftEnd)
+                Log.d(TAG, "onCreate 2: right end " + rightEnd)
+                newReceiptNumber = collectionAgent_id + "**" + leftEnd + (incrementingValue.toInt() + incrementValue) + rightEnd
+
+
+                Log.i(TAG, "increamentReceiptNumber: " + newReceiptNumber)
+
+            }
+            return newReceiptNumber
+        }
     }
 }

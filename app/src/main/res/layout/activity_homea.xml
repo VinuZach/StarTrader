@@ -84,8 +84,9 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
 
+
+            <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,6 +97,7 @@
                     android:id="@+id/customername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:dropDownHeight="100dp"
                     android:fontFamily="@font/lexend_regular"
 
@@ -104,6 +106,27 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:id="@+id/outstandingpar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/outstanding_bal_label"
+                    app:fontFamily="@font/lexend_medium" />
+
+                <TextView
+                    android:id="@+id/outstandingbal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="123"
+                    android:paddingStart="20dp"
+                    app:fontFamily="@font/lexend_extrabold" />
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

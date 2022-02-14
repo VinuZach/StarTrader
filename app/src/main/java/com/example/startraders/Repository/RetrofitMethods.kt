@@ -154,7 +154,7 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>() {
         executiveID : String, totalAmount : String, discountDetails : DiscountModel,apiResponse : ApiResponse
     ) {
          partList  = ArrayList()
-
+        Log.d(TAG, "uploadReceipt_cash: invoiceNumber "+invoiceNumber)
         partList.add(createStringMultiPartBody("received_status", "cash"))
         partList.add(createStringMultiPartBody("exId", executiveID))
         partList.add(createStringMultiPartBody("remark", remark))
@@ -270,10 +270,14 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>() {
         retrofitBuilder.uploadReceipt(partList).enqueue(object : Callback<ArrayList<BaseResponse>> {
             override fun onResponse(call : Call<ArrayList<BaseResponse>>, response : Response<ArrayList<BaseResponse>>
             ) {
+
                 if (response.isSuccessful) {
 
+
                     try {
+
                         val baseRespose = response.body()?.get(0)
+                        Log.d(TAG, "onResponse: "+baseRespose.toString())
                         if (baseRespose?.status == "true") {
                             apiResponse.onResponseObtained(true, baseRespose)
 

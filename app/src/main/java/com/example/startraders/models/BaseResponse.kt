@@ -16,4 +16,8 @@ class BaseResponse {
     @SerializedName("message")
     @Expose
     var message : String? = null
+    override fun toString(): String
+    {
+        return "message : "+message+" status  : "+status
+    }
 }
