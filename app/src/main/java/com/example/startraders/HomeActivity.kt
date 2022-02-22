@@ -157,9 +157,7 @@ class HomeActivity : AppCompatActivity()
 //
 //        }
 
-        Log.d("asdsdwe", "onCreate: " + getCurrentDate())
-        receiptDateTextInputEditText.setText(getCurrentDate())
-        prevReceiptDateTextInputEditText.setText(getCurrentDate())
+
 
 
 //        prevReceiptNumberAutoCompleteTextView.setAdapter(adapter)
@@ -479,6 +477,14 @@ class HomeActivity : AppCompatActivity()
         }
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+        Log.d("asdsdwe", "onCreate: " + getCurrentDate())
+        receiptDateTextInputEditText.setText(getCurrentDate())
+        prevReceiptDateTextInputEditText.setText(getCurrentDate())
+
+    }
     /**
      * Set up printer connection
      *display dialog to connect to bluetooth printer
@@ -521,6 +527,7 @@ class HomeActivity : AppCompatActivity()
             printerManger.cancelConnection()
             dialog.cancel()
         }
+        Log.d("ajshdhsajdh", "printData: "+receiptDateTextInputEditText.text.toString())
         printButton.setOnClickListener {
             printerManger.printData(receiptDateTextInputEditText.text.toString(), invoiceID, selectedCustomerDetails!!,
                 totalAmountAutoComplete.text.toString(), paymentMode, outStandingBalance)
