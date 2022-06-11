@@ -24,5 +24,9 @@ class LoginResponse {
     @Expose
     var newInvoice : String = ""
 
+    @SerializedName("name")
+    @Expose
+    var name : String = ""
+
 
 }

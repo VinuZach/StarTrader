@@ -25,6 +25,7 @@ class SharedPrefData() {
 
     companion object {
         var IS_USER_LOGGED_IN = booleanPreferencesKey(name = "isUserLoggedIn")
+        var EXECUTIVE_NAME = stringPreferencesKey(name = "executiveName")
         var INVOICE_ID = stringPreferencesKey(name = "invoice_id")
         var COLLECTION_AGENT_ID = stringPreferencesKey(name = "collectionAgentID")
     }

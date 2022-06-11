@@ -37,6 +37,7 @@ import androidx.core.content.ContextCompat
 import com.example.startraders.HomeActivity.Companion.getModifiedReceiptNumber
 import com.example.startraders.Repository.RetrofitManger
 import com.example.startraders.Repository.SharedPrefData.Companion.COLLECTION_AGENT_ID
+import com.example.startraders.Repository.SharedPrefData.Companion.EXECUTIVE_NAME
 import com.example.startraders.Repository.SharedPrefData.Companion.INVOICE_ID
 import com.example.startraders.Repository.SharedPrefData.Companion.IS_USER_LOGGED_IN
 import com.example.startraders.models.LoginResponse
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity()
             startActivity(Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
             finish()
         }
-
+//
 //        RepositoryManager.retrofitObject.verifyUser("BALU1@GMAIL.COM",
 //                "BALUSL",
 //                object : RetrofitManger.ApiResponse {
@@ -210,6 +211,7 @@ class MainActivity : AppCompatActivity()
                                 {
                                     val loginResponse = responseData as LoginResponse
                                     RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, IS_USER_LOGGED_IN, true)
+                                    RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, EXECUTIVE_NAME, loginResponse.name)
 
 
                                     RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, INVOICE_ID,

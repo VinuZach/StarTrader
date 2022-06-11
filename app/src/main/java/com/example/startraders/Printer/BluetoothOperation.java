@@ -1,5 +1,6 @@
 package com.example.startraders.Printer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,8 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import com.android.print.sdk.PrinterConstants.Connect;
 import com.android.print.sdk.PrinterInstance;
@@ -34,11 +39,11 @@ public class BluetoothOperation implements IPrinterOpertion {
 		mContext = context;
 		mHandler = handler;
 		hasRegDisconnectReceiver = false;
-
+		Log.d(TAG, "BluetoothOperation: ");
 		filter = new IntentFilter();
-        //filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        //filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+		//filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+		//filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+		filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 	}
 
 	public void open(Intent data) {
@@ -46,13 +51,18 @@ public class BluetoothOperation implements IPrinterOpertion {
 		deviceAddress = data.getExtras().getString(
 				BluetoothDeviceList.EXTRA_DEVICE_ADDRESS);
 		mDevice = adapter.getRemoteDevice(deviceAddress);
-
+		Log.d(TAG, "open: asdasdsad");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+		if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+			Log.d(TAG, "open: no per 1111");
+			return;
+		}
 		if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
 			Log.i(TAG, "device.getBondState() is BluetoothDevice.BOND_NONE");
 			PairOrRePairDevice(false, mDevice);
 		} else if (mDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
 			rePair = data.getExtras().getBoolean(
-				BluetoothDeviceList.EXTRA_RE_PAIR);
+					BluetoothDeviceList.EXTRA_RE_PAIR);
 			if (rePair) {
 				PairOrRePairDevice(true, mDevice);
 			} else {
@@ -115,34 +125,39 @@ public class BluetoothOperation implements IPrinterOpertion {
 				if (!mDevice.equals(device)) {
 					return;
 				}
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+				if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+					Log.d(TAG, "open: no per 2222");
+					return;
+				}
 				switch (device.getBondState()) {
-				case BluetoothDevice.BOND_BONDING:
-					Log.i(TAG, "bounding......");
-					break;
-				case BluetoothDevice.BOND_BONDED:
-					Log.i(TAG, "bound success");
-					// if bound success, auto init BluetoothPrinter. open
-					// connect.
-					if (hasRegBoundReceiver) {
-						mContext.unregisterReceiver(boundDeviceReceiver);
-						hasRegBoundReceiver = false;
-					}
-					openPrinter();
-					break;
-				case BluetoothDevice.BOND_NONE:
-					if (rePair) {
-						rePair = false;
-						Log.i(TAG, "removeBond success, wait create bound.");
-						PairOrRePairDevice(false, device);
-					} else if (hasRegBoundReceiver) {
-						mContext.unregisterReceiver(boundDeviceReceiver);
-						hasRegBoundReceiver = false;
-						// bond failed
-						mHandler.obtainMessage(Connect.FAILED).sendToTarget();
-						Log.i(TAG, "bound cancel");
-					}
-				default:
-					break;
+					case BluetoothDevice.BOND_BONDING:
+						Log.i(TAG, "bounding......");
+						break;
+					case BluetoothDevice.BOND_BONDED:
+						Log.i(TAG, "bound success");
+						// if bound success, auto init BluetoothPrinter. open
+						// connect.
+						if (hasRegBoundReceiver) {
+							mContext.unregisterReceiver(boundDeviceReceiver);
+							hasRegBoundReceiver = false;
+						}
+						openPrinter();
+						break;
+					case BluetoothDevice.BOND_NONE:
+						if (rePair) {
+							rePair = false;
+							Log.i(TAG, "removeBond success, wait create bound.");
+							PairOrRePairDevice(false, device);
+						} else if (hasRegBoundReceiver) {
+							mContext.unregisterReceiver(boundDeviceReceiver);
+							hasRegBoundReceiver = false;
+							// bond failed
+							mHandler.obtainMessage(Connect.FAILED).sendToTarget();
+							Log.i(TAG, "bound cancel");
+						}
+					default:
+						break;
 				}
 			}
 		}
@@ -153,7 +168,7 @@ public class BluetoothOperation implements IPrinterOpertion {
 			mPrinter.closeConnection();
 			mPrinter = null;
 		}
-		if(hasRegDisconnectReceiver){
+		if (hasRegDisconnectReceiver) {
 			mContext.unregisterReceiver(myReceiver);
 			hasRegDisconnectReceiver = false;
 		}
@@ -161,7 +176,7 @@ public class BluetoothOperation implements IPrinterOpertion {
 
 	public PrinterInstance getPrinter() {
 		if (mPrinter != null && mPrinter.isConnected()) {
-			if(!hasRegDisconnectReceiver){
+			if (!hasRegDisconnectReceiver) {
 				mContext.registerReceiver(myReceiver, filter);
 				hasRegDisconnectReceiver = true;
 			}
@@ -186,9 +201,15 @@ public class BluetoothOperation implements IPrinterOpertion {
 
 	@Override
 	public void chooseDevice() {
+		Log.d(TAG, "chooseDevice "+adapter.isEnabled());
 		if (!adapter.isEnabled()) {
 			Intent enableIntent = new Intent(
 					BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+			if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+				Log.d(TAG, "open: no per 3333");
+				return;
+			}
 			((Activity) mContext).startActivityForResult(enableIntent,
 					MainActivity.ENABLE_BT);
 		} else {

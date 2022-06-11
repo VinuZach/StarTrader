@@ -3,11 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item
+        android:id="@+id/version"
         android:title="@string/versionName"
         android:titleCondensed="@string/cucumber"
-        android:id="@+id/version"
-        app:showAsAction="withText"
-        />
+        app:showAsAction="withText" />
+    <item
+        android:id="@+id/billhistory"
+        android:orderInCategory="100"
+        android:title="Statement History"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/collection"
+        android:orderInCategory="100"
+        android:title="Collection Report"
+        android:visible="true"
+        app:showAsAction="never" />
     <item
         android:id="@+id/statement"
         android:orderInCategory="100"

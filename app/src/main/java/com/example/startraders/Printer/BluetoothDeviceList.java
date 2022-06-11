@@ -1,5 +1,6 @@
 package com.example.startraders.Printer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,6 +8,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -25,6 +28,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.example.startraders.R;
 
@@ -59,11 +68,14 @@ public class BluetoothDeviceList extends Activity {
         // Set result CANCELED incase the user backs out
         setResult(Activity.RESULT_CANCELED);
 
+
         initView();
+
+
     }
 
-    private void initView(){
-    	// Initialize the button to perform device discovery
+    private void initView() {
+        // Initialize the button to perform device discovery
         scanButton = (Button) findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -84,6 +96,10 @@ public class BluetoothDeviceList extends Activity {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Get a set of currently paired devices
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
         // If there are paired devices, add each one to the ArrayAdapter
         if (pairedDevices.size() > 0) {
@@ -98,6 +114,12 @@ public class BluetoothDeviceList extends Activity {
     @Override
 	protected void onStop() {
 		// Make sure we're not doing discovery anymore
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            this.unregisterReceiver(mReceiver);
+            super.onStop();
+            return;
+        }
         if (mBtAdapter != null && mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
@@ -115,6 +137,33 @@ public class BluetoothDeviceList extends Activity {
         registerReceiver(mReceiver, filter);
         super.onResume();
 	}
+    private static final String[] BLE_PERMISSIONS = new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+    };
+
+    private static final String[] ANDROID_12_BLE_PERMISSIONS = new String[]{
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+    };
+final int BLUETOOTH_REQUEST_CODE=101;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==BLUETOOTH_REQUEST_CODE)
+        {
+            Log.d("BluetoothOpertion", "onRequestPermissionsResult: ");
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // Showing the toast message
+                Toast.makeText(BluetoothDeviceList.this, "BLUETOOTH_REQUEST_CODE Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(BluetoothDeviceList.this, "BLUETOOTH_REQUEST_CODE Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     /**
      * Start device discover with the BluetoothAdapter
@@ -125,7 +174,16 @@ public class BluetoothDeviceList extends Activity {
         // Indicate scanning in the title
         setProgressBarIndeterminateVisibility(true);
         setTitle(R.string.scanning);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            scanButton.setEnabled(true);
+            Log.d("BluetoothOpertion", "doDiscovery: not granted");
+                    ActivityCompat.requestPermissions(this, ANDROID_12_BLE_PERMISSIONS, BLUETOOTH_REQUEST_CODE);
 
+
+
+            return;
+        }
         // If we're already discovering, stop it
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
@@ -139,7 +197,11 @@ public class BluetoothDeviceList extends Activity {
     private void returnToPreviousActivity(String address, boolean re_pair)
     {
     	// Cancel discovery because it's costly and we're about to connect
-    	if (mBtAdapter.isDiscovering()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
 
@@ -213,7 +275,10 @@ public class BluetoothDeviceList extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent

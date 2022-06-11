@@ -15,14 +15,14 @@ class CustomerOutResponse {
 
     @SerializedName("data")
     @Expose
-    var date : Date? = null
+    var data : OutstandingData? = null
 
     override fun toString() : String {
-        return date.toString()+" "+status
+        return data.toString()+" "+status
     }
 
 }
-class Date
+class OutstandingData
 {
 
     @SerializedName("outstanding_balance")

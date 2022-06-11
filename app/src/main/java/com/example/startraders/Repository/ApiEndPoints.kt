@@ -3,10 +3,7 @@ package com.example.startraders.Repository
 import com.example.startraders.models.*
 import okhttp3.MultipartBody
 import retrofit2.Call
-import retrofit2.http.Header
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.*
 
 interface ApiEndPoints
 {
@@ -18,6 +15,10 @@ interface ApiEndPoints
     @Multipart
     @POST("GetCustomer")
     fun retrieveUserList(@Part partMap: List<MultipartBody.Part>): Call<ArrayList<CustomerList>>
+
+    @GET("GetLastFiveCollection")
+    fun getLastFiveReceipts(@Query("executive_id") executive_id: String, @Query("from_date") from_date: String,
+        @Query("to_date") to_date: String, @Query("customer_id") customer_id: String): Call<ArrayList<LastFiveReceiptsResponse>>
 
     @Multipart
     @POST("Logout")
@@ -44,4 +45,8 @@ interface ApiEndPoints
     @POST("OutStandingBalance")
     fun retrieveCustomerBalance(@Part partMap: List<MultipartBody.Part>): Call<ArrayList<CustomerOutResponse>>
 
+
+    @GET("GetLastDayCollection")
+    fun getLastDayCollections(@Query("executive_id") executive_id: String,
+        @Query("to_date") to_date: String): Call<ArrayList<LastDayCollection>>;
 }

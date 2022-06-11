@@ -3,6 +3,8 @@
     <string name="create_new_receipt">Create New Receipt</string>
     <string name="receipt_number">Receipt Number</string>
     <string name="date">Date</string>
+    <string name="startdate">Start Date</string>
+    <string name="enddate">End Date</string>
     <string name="customer_name">Customer name</string>
     <string name="receipt_date">Receipt date</string>
     <string name="requested_amount">Requested Amount</string>
@@ -11,8 +13,6 @@
     <string name="user_logging_out">Logging out</string>
     <string name="receipt_statement_request">Requesting statement </string>
     <string name="outstanding_bal_label">Outstanding Balance : </string>
-
-
 
 
     <string-array name="denominationvalue">
@@ -25,7 +25,6 @@
         <item>500</item>
         <item>2000</item>
     </string-array>
-
 
 
     <string name="bluetooth">bluetooth</string>
@@ -142,4 +141,6 @@
     <string name="text_strike_point18">This is the line of strikethrough text, 18-point font</string>
     <string name="text_underLine_point18">This is the line of underlined text, 18-point font</string>
     <string name="text_common_point18">This is a line of plain text, 18-point font</string>
+    <string name="currency">Rupees</string>
+    <string name="currency_symbol">\u20B9</string>
 </resources>

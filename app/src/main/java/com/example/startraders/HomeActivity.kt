@@ -2,11 +2,15 @@ package com.example.startraders
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -15,7 +19,6 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-
 import com.example.startraders.Repository.RetrofitManger
 import com.example.startraders.Repository.RetrofitMethods
 import com.example.startraders.Repository.SharedPrefData
@@ -25,24 +28,6 @@ import com.example.startraders.models.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import java.util.*
-import android.text.style.ForegroundColorSpan
-
-import android.text.SpannableString
-import android.text.Html
-
-import android.R.id
-import android.graphics.Typeface
-import android.icu.lang.UProperty
-import android.widget.TextView
-
-import android.text.Spannable
-
-import android.icu.lang.UProperty.INT_START
-
-import android.text.SpannableStringBuilder
-import android.text.style.StyleSpan
-import android.R.id.text2
-import android.content.Context
 
 /**
  * Home activity
@@ -156,8 +141,6 @@ class HomeActivity : AppCompatActivity()
 //            pickDate(HomeActivity@ this, receiptDateTextInputEditText)
 //
 //        }
-
-
 
 
 //        prevReceiptNumberAutoCompleteTextView.setAdapter(adapter)
@@ -485,6 +468,7 @@ class HomeActivity : AppCompatActivity()
         prevReceiptDateTextInputEditText.setText(getCurrentDate())
 
     }
+
     /**
      * Set up printer connection
      *display dialog to connect to bluetooth printer
@@ -496,6 +480,7 @@ class HomeActivity : AppCompatActivity()
 
 
         val connectionStatus = MutableLiveData<String>()
+
         printerManger.listDevices(this, connectionStatus)
 
         val dialog = Dialog(this)
@@ -527,7 +512,8 @@ class HomeActivity : AppCompatActivity()
             printerManger.cancelConnection()
             dialog.cancel()
         }
-        Log.d("ajshdhsajdh", "printData: "+receiptDateTextInputEditText.text.toString())
+        Log.d("ajshdhsajdh", "printData: " + receiptDateTextInputEditText.text.toString())
+        Log.d("ajshdhsajdh", "printData: " + outStandingBalance)
         printButton.setOnClickListener {
             printerManger.printData(receiptDateTextInputEditText.text.toString(), invoiceID, selectedCustomerDetails!!,
                 totalAmountAutoComplete.text.toString(), paymentMode, outStandingBalance)
@@ -609,7 +595,8 @@ class HomeActivity : AppCompatActivity()
 
         Log.d(TAG, "orginal onCreate: " + invoiceID)
 
-        RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@HomeActivity, INVOICE_ID, data = getModifiedReceiptNumber(invoiceID,collectionAgent_id))
+        RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@HomeActivity, INVOICE_ID,
+            data = getModifiedReceiptNumber(invoiceID, collectionAgent_id))
         val paymentMode: String
         if (cashToggleButton.isChecked) paymentMode = "Cash"
         else if (chequeToggleButton.isChecked) paymentMode = "Cheque"
@@ -646,7 +633,7 @@ class HomeActivity : AppCompatActivity()
         rtgsDateAutoComplete.text?.clear()
         rtgsNumberAutoComplete.text?.clear()
         selectedCustomerDetails = null
-
+        outStandingBalance="0"
         retrieveCustomer()
 
     }
@@ -671,8 +658,8 @@ class HomeActivity : AppCompatActivity()
                     discountDates = (responseData as CustomerDiscountDates).date as MutableList<String>
 
                 }
-                val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line,
-                    discountDates)
+                val adapter: ArrayAdapter<String> =
+                    ArrayAdapter<String>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line, discountDates)
 
                 prevReceiptDateTextInputEditText.setAdapter(adapter)
                 prevReceiptDateTextInputEditText.threshold = 1
@@ -701,8 +688,8 @@ class HomeActivity : AppCompatActivity()
                             discountReceiptNo = (responseData as CustomerDiscountDates).date as MutableList<String>
 
                         }
-                        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this@HomeActivity,
-                            android.R.layout.simple_dropdown_item_1line, discountReceiptNo)
+                        val adapter: ArrayAdapter<String> =
+                            ArrayAdapter<String>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line, discountReceiptNo)
 
                         prevReceiptNumberAutoCompleteTextView.setAdapter(adapter)
                         prevReceiptNumberAutoCompleteTextView.threshold = 1
@@ -743,8 +730,8 @@ class HomeActivity : AppCompatActivity()
                 if (isSuccess)
                 {
                     val response = responseData as CustomerOutResponse
-                    Log.d(TAG, "onResponseObtained: " + response.date?.outstandingBalance)
-                    outStandingBalance = response.date?.outstandingBalance
+                    Log.d(TAG, "onResponseObtained: " + response.data?.outstandingBalance)
+                    outStandingBalance = response.data?.outstandingBalance
                     outStandingBal_Parent.visibility = View.VISIBLE
                     findViewById<TextView>(R.id.outstandingbal).text = outStandingBalance
                 }
@@ -953,6 +940,8 @@ class HomeActivity : AppCompatActivity()
     {
         if (item.itemId == R.id.statement)
         {
+
+
             showDialog()
         }
         if (item.itemId == R.id.logout)
@@ -983,6 +972,26 @@ class HomeActivity : AppCompatActivity()
 
             })
         }
+        if (item.itemId == R.id.billhistory)
+        {
+           val intent=Intent(this@HomeActivity, BillHistoryActivity::class.java)
+            intent.putExtra("customerList",  ArrayList(customerList))
+            startActivity(intent)
+        }
+        if(item.itemId==R.id.collection)
+        {
+            startActivity(Intent(this@HomeActivity,CollectionReportActivity::class.java))
+//            val connectionStatus = MutableLiveData<String>()
+//
+//            printerManger.listDevices(this, connectionStatus)
+//            connectionStatus.observe(this, androidx.lifecycle.Observer {
+//                Log.d(TAG, "listDevices: " + it)
+//                if (it.equals("Connected to printer"))
+//
+//                    printerManger.printCollectionReport()
+//        })
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -1074,8 +1083,8 @@ class HomeActivity : AppCompatActivity()
         customerNameAutoTextView = dialog.findViewById(R.id.customername)
 
 
-        val adapter: ArrayAdapter<CustomerDetails> = ArrayAdapter<CustomerDetails>(this@HomeActivity,
-            android.R.layout.simple_dropdown_item_1line, customerList)
+        val adapter: ArrayAdapter<CustomerDetails> =
+            ArrayAdapter<CustomerDetails>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line, customerList)
 
 
         customerNameAutoTextView.setAdapter(adapter)
@@ -1159,7 +1168,7 @@ class HomeActivity : AppCompatActivity()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d(TAG, ":asdsadas ")
+        Log.d("BluetoothOpertion", ":asdsadas ")
         printerManger.handleActivityResult(this, requestCode, resultCode, data)
     }
 
@@ -1183,8 +1192,9 @@ class HomeActivity : AppCompatActivity()
 
                     customerList = customerListFromApi.data as MutableList<CustomerDetails>
 
-                    val adapter: ArrayAdapter<CustomerDetails> = ArrayAdapter<CustomerDetails>(this@HomeActivity,
-                        android.R.layout.simple_dropdown_item_1line, customerList)
+
+                    val adapter: ArrayAdapter<CustomerDetails> =
+                        ArrayAdapter<CustomerDetails>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line, customerList)
                     customerNameAutoTextView.text.clear()
                     selectedCustomerDetails = null
                     customerNameAutoTextView.setAdapter(adapter)
@@ -1195,6 +1205,7 @@ class HomeActivity : AppCompatActivity()
                 }
                 else
                 {
+                    customerList = mutableListOf<CustomerDetails>()
                     val errorMessage = responseData as String
                     Toast.makeText(this@HomeActivity, errorMessage, Toast.LENGTH_SHORT).show()
                     submitButton.isEnabled = false
@@ -1207,7 +1218,7 @@ class HomeActivity : AppCompatActivity()
     companion object
     {
         val TAG: String = "sadtrthg"
-        fun getModifiedReceiptNumber(invoiceID: String, collectionAgent_id: String, toIncrement: Boolean = true):String
+        fun getModifiedReceiptNumber(invoiceID: String, collectionAgent_id: String, toIncrement: Boolean = true): String
         {
             val splitValue = invoiceID.split("-")
             val newReceiptNumber: String
@@ -1222,9 +1233,9 @@ class HomeActivity : AppCompatActivity()
             val incrementingValue: String
             if (leftSplit.size >= 2)
             {
-                leftEnd=collectionAgent_id+"**"+  splitValue[0].split("*")[splitValue[0].split("*").size-1]
+                leftEnd = collectionAgent_id + "**" + splitValue[0].split("*")[splitValue[0].split("*").size - 1]
 
-                Log.d(TAG, "getModifiedReceiptNumber: "+             splitValue[0].split("*"))
+                Log.d(TAG, "getModifiedReceiptNumber: " + splitValue[0].split("*"))
 
                 val rightSplit = splitValue[splitValue.size - 1].split("/")
                 rightEnd = rightSplit[rightSplit.size - 1]

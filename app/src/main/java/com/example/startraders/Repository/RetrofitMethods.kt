@@ -55,6 +55,41 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
         })
     }
 
+
+    fun retrieveLastFiveBills(executiveID: String, startDate: String, endDate: String, customerId: String, apiResponse: ApiResponse)
+    {
+        Log.d(TAG, "retrieveLastFiveBills: startDate " + startDate)
+        Log.d(TAG, "retrieveLastFiveBills: endDate " + endDate)
+        Log.d(TAG, "retrieveLastFiveBills: customerId " + customerId)
+
+        retrofitBuilder.getLastFiveReceipts(executiveID, startDate, endDate, customerId)
+            .enqueue(object : Callback<ArrayList<LastFiveReceiptsResponse>>
+            {
+                override fun onResponse(call: Call<ArrayList<LastFiveReceiptsResponse>>,
+                    response: Response<ArrayList<LastFiveReceiptsResponse>>)
+                {
+                    if (response.isSuccessful)
+                    {
+                        Log.d(TAG, "onResponse: 1 " + response.body()?.size)
+                        response.body()?.let {
+
+                            apiResponse.onResponseObtained(true, it)
+                        } ?: run {
+                            apiResponse.onResponseObtained(false, "Response not obtained")
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<ArrayList<LastFiveReceiptsResponse>>, t: Throwable)
+                {
+                    Log.d(TAG, "onFailure: " + t.localizedMessage)
+                    apiResponse.onResponseObtained(false, "Sever connection error")
+                }
+
+            })
+
+    }
+
     fun retrieveCustomerList(collectionAgentId: String, apiResponse: ApiResponse)
     {
         val partList: MutableList<MultipartBody.Part> = ArrayList()
@@ -65,6 +100,7 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
         {
             override fun onResponse(call: Call<ArrayList<CustomerList>>, response: Response<ArrayList<CustomerList>>)
             {
+                Log.d(TAG, "retrieveCustomerList: " + response.isSuccessful)
                 if (response.isSuccessful)
                 {
 
@@ -174,7 +210,7 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
 
     var partList: MutableList<MultipartBody.Part> = ArrayList()
     fun uploadReceipt_cash(customer: CustomerDetails, invoiceNumber: String, date: String, remark: String, executiveID: String,
-            totalAmount: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
+        totalAmount: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
     {
         partList = ArrayList()
         Log.d(TAG, "uploadReceipt_cash: invoiceNumber " + invoiceNumber)
@@ -219,7 +255,7 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
     }
 
     fun uploadReceipt_cheque(remark: String, date: String, invoiceNumber: String, executiveID: String, customer: CustomerDetails,
-            chequeNumber: String, chequeDate: String, chequeAmount: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
+        chequeNumber: String, chequeDate: String, chequeAmount: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
     {
 
         partList = ArrayList()
@@ -253,7 +289,7 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
     }
 
     fun uploadReceipt_RTGS(executiveID: String, date: String, invoiceNumber: String, customer: CustomerDetails, rtgsAmount: String,
-            rtgsDate: String, rtgsNumber: String, remark: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
+        rtgsDate: String, rtgsNumber: String, remark: String, discountDetails: DiscountModel, apiResponse: ApiResponse)
     {
 
 
@@ -332,33 +368,33 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
         val partList: MutableList<MultipartBody.Part> = ArrayList()
         partList.add(createStringMultiPartBody("customerName", customerName))
         retrofitBuilder.retrieveCustomerDiscountDates(partList).enqueue(object : Callback<ArrayList<CustomerDiscountDates>>
+        {
+            override fun onResponse(call: Call<ArrayList<CustomerDiscountDates>>, response: Response<ArrayList<CustomerDiscountDates>>)
             {
-                override fun onResponse(call: Call<ArrayList<CustomerDiscountDates>>, response: Response<ArrayList<CustomerDiscountDates>>)
+                if (response.isSuccessful)
                 {
-                    if (response.isSuccessful)
+                    try
                     {
-                        try
+                        val customerDiscountDates = response.body()?.get(0)
+                        if (customerDiscountDates?.status == "true")
                         {
-                            val customerDiscountDates = response.body()?.get(0)
-                            if (customerDiscountDates?.status == "true")
-                            {
-                                apiResponse.onResponseObtained(true, customerDiscountDates)
-                            }
-                            else apiResponse.onResponseObtained(false, "No discount dates available")
-                        } catch (e: Exception)
-                        {
-                            apiResponse.onResponseObtained(false, "Response not obtained")
+                            apiResponse.onResponseObtained(true, customerDiscountDates)
                         }
+                        else apiResponse.onResponseObtained(false, "No discount dates available")
+                    } catch (e: Exception)
+                    {
+                        apiResponse.onResponseObtained(false, "Response not obtained")
                     }
-                    else apiResponse.onResponseObtained(false, "Response not obtained")
                 }
+                else apiResponse.onResponseObtained(false, "Response not obtained")
+            }
 
-                override fun onFailure(call: Call<ArrayList<CustomerDiscountDates>>, t: Throwable)
-                {
-                    apiResponse.onResponseObtained(false, "Sever connection error")
-                }
+            override fun onFailure(call: Call<ArrayList<CustomerDiscountDates>>, t: Throwable)
+            {
+                apiResponse.onResponseObtained(false, "Sever connection error")
+            }
 
-            })
+        })
     }
 
     fun retrieveCustomerPrevReceipt(customerName: String, prevReceiptDate: String, apiResponse: ApiResponse)
@@ -366,34 +402,63 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
         val partList: MutableList<MultipartBody.Part> = ArrayList()
         partList.add(createStringMultiPartBody("customerName", customerName))
         partList.add(createStringMultiPartBody("date", prevReceiptDate))
+
         retrofitBuilder.retrieveCustomerPrevBill(partList).enqueue(object : Callback<ArrayList<CustomerDiscountDates>>
+        {
+            override fun onResponse(call: Call<ArrayList<CustomerDiscountDates>>, response: Response<ArrayList<CustomerDiscountDates>>)
             {
-                override fun onResponse(call: Call<ArrayList<CustomerDiscountDates>>, response: Response<ArrayList<CustomerDiscountDates>>)
+                if (response.isSuccessful)
                 {
-                    if (response.isSuccessful)
+                    try
                     {
-                        try
+                        val customerDiscountDates = response.body()?.get(0)
+                        if (customerDiscountDates?.status == "true")
                         {
-                            val customerDiscountDates = response.body()?.get(0)
-                            if (customerDiscountDates?.status == "true")
-                            {
-                                apiResponse.onResponseObtained(true, customerDiscountDates)
-                            }
-                            else apiResponse.onResponseObtained(false, "No discount dates available")
-                        } catch (e: Exception)
-                        {
-                            apiResponse.onResponseObtained(false, "Response not obtained")
+                            apiResponse.onResponseObtained(true, customerDiscountDates)
                         }
+                        else apiResponse.onResponseObtained(false, "No discount dates available")
+                    } catch (e: Exception)
+                    {
+                        apiResponse.onResponseObtained(false, "Response not obtained")
                     }
-                    else apiResponse.onResponseObtained(false, "Response not obtained")
                 }
+                else apiResponse.onResponseObtained(false, "Response not obtained")
+            }
 
-                override fun onFailure(call: Call<ArrayList<CustomerDiscountDates>>, t: Throwable)
+            override fun onFailure(call: Call<ArrayList<CustomerDiscountDates>>, t: Throwable)
+            {
+                apiResponse.onResponseObtained(false, "Sever connection error")
+            }
+
+        })
+    }
+
+
+    fun retrieveCollectionReport(executiveID: String, toDate: String, apiResponse: ApiResponse)
+    {
+        retrofitBuilder.getLastDayCollections(executiveID, toDate).enqueue(object : Callback<ArrayList<LastDayCollection>>
+        {
+            override fun onResponse(call: Call<ArrayList<LastDayCollection>>, response: Response<ArrayList<LastDayCollection>>)
+            {
+
+                if (response.isSuccessful)
                 {
-                    apiResponse.onResponseObtained(false, "Sever connection error")
-                }
 
-            })
+
+                    apiResponse.onResponseObtained(true, response.body())
+
+
+                }
+                else apiResponse.onResponseObtained(false, "Response not obtained")
+            }
+
+            override fun onFailure(call: Call<ArrayList<LastDayCollection>>, t: Throwable)
+            {
+                Log.d(TAG, "onFailure: getLastDayCollections")
+                apiResponse.onResponseObtained(false, "Sever connection error")
+            }
+
+        })
     }
 
     fun retrieveCustomerBalance(customerId: String, apiResponse: ApiResponse)
@@ -430,4 +495,6 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
 
         })
     }
+
+
 }
