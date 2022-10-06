@@ -95,6 +95,10 @@ class HomeActivity : AppCompatActivity()
 
     var outStandingBalance: String? = null
 
+
+    lateinit var printPreviewParent: View
+    lateinit var billDataEntryScrollView: ScrollView
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -458,6 +462,7 @@ class HomeActivity : AppCompatActivity()
 
 
         }
+
     }
 
     override fun onResume()
@@ -602,8 +607,33 @@ class HomeActivity : AppCompatActivity()
         else if (chequeToggleButton.isChecked) paymentMode = "Cheque"
         else paymentMode = "RTGS"
 
+
+
         setUpPrinterConnection(paymentMode)
 
+    }
+
+    private fun displayPrintPreview(paymentMode: String)
+    {
+
+
+        printPreviewParent.findViewById<TextView>(R.id.billdate).text = "Date: " + receiptDateTextInputEditText.text.toString()
+        printPreviewParent.findViewById<TextView>(R.id.billnumber).text = "Bill No: " + invoiceID
+        printPreviewParent.findViewById<TextView>(R.id.customername).text = "Received from: " + selectedCustomerDetails!!.customerName
+        printPreviewParent.findViewById<TextView>(R.id.amount).text = "Received Amount: " + totalAmountAutoComplete.text.toString()
+        val totalAmount = totalAmountAutoComplete.text.toString()
+        printPreviewParent.findViewById<TextView>(R.id.amountwrd).text =
+            "Amount in words : " + Currency.convertToIndianCurrency(totalAmount)
+        printPreviewParent.findViewById<TextView>(R.id.openbal).text = "Opening Balance : " + outStandingBalance
+        printPreviewParent.findViewById<TextView>(R.id.paymode).text = "Payment Mode : " + paymentMode
+
+        try
+        {
+            val closingBalance = outStandingBalance?.toDouble()?.minus(totalAmount.toDouble())
+            printPreviewParent.findViewById<TextView>(R.id.closebal).text = "Closing Balance : " + closingBalance
+        } catch (e: Exception)
+        {
+        }
 
     }
 
@@ -618,6 +648,7 @@ class HomeActivity : AppCompatActivity()
         invoiceID = RepositoryManager.sharedPrefData.getDataWithoutLiveData(this, INVOICE_ID, "")
         findViewById<TextInputEditText>(R.id.invoiceid).setText(invoiceID)
         totalCashAmount = 0.0
+        submitButton.isEnabled = false
         outStandingBal_Parent.visibility = View.GONE
         selectedCashDenomination.removeAllViews()
         cashAmountMutableData.postValue(totalCashAmount)
@@ -633,7 +664,7 @@ class HomeActivity : AppCompatActivity()
         rtgsDateAutoComplete.text?.clear()
         rtgsNumberAutoComplete.text?.clear()
         selectedCustomerDetails = null
-        outStandingBalance="0"
+        outStandingBalance = "-1"
         retrieveCustomer()
 
     }
@@ -721,24 +752,38 @@ class HomeActivity : AppCompatActivity()
      */
     private fun retrieveOutstandingBalance()
     {
-
+        findViewById<LinearLayout>(R.id.outstandingpar).setOnClickListener { retrieveOutstandingBalance() }
+        val dataEntryFields = findViewById<LinearLayout>(R.id.hhhhh);
+        dataEntryFields.visibility = View.GONE
+        val outstandingBalance = findViewById<TextView>(R.id.outstandingbal)
+        outstandingBalance.text = ""
+        findViewById<TextView>(R.id.outstandinglabel).visibility = View.VISIBLE
         RepositoryManager.retrofitObject.retrieveCustomerBalance(selectedCustomerDetails!!.id, object : RetrofitManger.ApiResponse
         {
             override fun onResponseObtained(isSuccess: Boolean, responseData: Any?)
             {
 
+                outStandingBal_Parent.visibility = View.VISIBLE
                 if (isSuccess)
                 {
+                    enableDisableButton(true)
+                    dataEntryFields.visibility = View.VISIBLE
+
                     val response = responseData as CustomerOutResponse
                     Log.d(TAG, "onResponseObtained: " + response.data?.outstandingBalance)
                     outStandingBalance = response.data?.outstandingBalance
-                    outStandingBal_Parent.visibility = View.VISIBLE
-                    findViewById<TextView>(R.id.outstandingbal).text = outStandingBalance
+
+                    outstandingBalance.text = outStandingBalance
+                    outstandingBalance.setTextColor(ContextCompat.getColor(this@HomeActivity, R.color.black))
                 }
                 else
                 {
+                    findViewById<TextView>(R.id.outstandinglabel).visibility = View.GONE
+                    outstandingBalance.text = "Click to refresh Balance"
+                    outstandingBalance.setTextColor(ContextCompat.getColor(this@HomeActivity, R.color.red))
+                    enableDisableButton(false)
                     val errorMessage = responseData as String
-                    Toast.makeText(this@HomeActivity, "NO ", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@HomeActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
                 retreiveDiscountDates()
             }
@@ -788,6 +833,8 @@ class HomeActivity : AppCompatActivity()
         discountRadioGroup.check(R.id.radioNo)
         progressLayout = findViewById(R.id.progressLayout)
         loadingMessage = findViewById(R.id.message)
+        billDataEntryScrollView = findViewById(R.id.scrollView)
+
         discountAmtTextInputEditText = findViewById(R.id.prevrecieptamt)
 
 
@@ -974,13 +1021,13 @@ class HomeActivity : AppCompatActivity()
         }
         if (item.itemId == R.id.billhistory)
         {
-           val intent=Intent(this@HomeActivity, BillHistoryActivity::class.java)
-            intent.putExtra("customerList",  ArrayList(customerList))
+            val intent = Intent(this@HomeActivity, BillHistoryActivity::class.java)
+            intent.putExtra("customerList", ArrayList(customerList))
             startActivity(intent)
         }
-        if(item.itemId==R.id.collection)
+        if (item.itemId == R.id.collection)
         {
-            startActivity(Intent(this@HomeActivity,CollectionReportActivity::class.java))
+            startActivity(Intent(this@HomeActivity, CollectionReportActivity::class.java))
 //            val connectionStatus = MutableLiveData<String>()
 //
 //            printerManger.listDevices(this, connectionStatus)
@@ -1112,6 +1159,13 @@ class HomeActivity : AppCompatActivity()
     fun displayConfirmation(onDialogButtonClick: OnDialogButtonClick)
     {
 
+
+        val paymentMode: String
+        if (cashToggleButton.isChecked) paymentMode = "Cash"
+        else if (chequeToggleButton.isChecked) paymentMode = "Cheque"
+        else paymentMode = "RTGS"
+
+
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val window: Window? = dialog.getWindow()
@@ -1120,8 +1174,8 @@ class HomeActivity : AppCompatActivity()
         dialog.setContentView(R.layout.dialog_submitconfimation)
         val messageTextView: TextView = dialog.findViewById(R.id.confirmtext)
 
-
-
+        printPreviewParent = dialog.findViewById(R.id.printpreviewlayout)
+        displayPrintPreview(paymentMode)
         messageTextView.text = "Total received amount is "
         messageTextView.append(getColoredString(this, "Rs. " + totalAmountAutoComplete.text, ContextCompat.getColor(this, R.color.black)));
         dialog.findViewById<AppCompatButton>(R.id.confirm).setOnClickListener {
@@ -1186,12 +1240,10 @@ class HomeActivity : AppCompatActivity()
                 progressLayout.visibility = View.GONE
                 if (isSuccess)
                 {
-                    submitButton.isEnabled = true
+
                     val customerListFromApi = responseData as CustomerList
 
-
                     customerList = customerListFromApi.data as MutableList<CustomerDetails>
-
 
                     val adapter: ArrayAdapter<CustomerDetails> =
                         ArrayAdapter<CustomerDetails>(this@HomeActivity, android.R.layout.simple_dropdown_item_1line, customerList)
@@ -1208,11 +1260,18 @@ class HomeActivity : AppCompatActivity()
                     customerList = mutableListOf<CustomerDetails>()
                     val errorMessage = responseData as String
                     Toast.makeText(this@HomeActivity, errorMessage, Toast.LENGTH_SHORT).show()
-                    submitButton.isEnabled = false
+                    enableDisableButton(false)
                 }
             }
 
         })
+    }
+
+    fun enableDisableButton(enable: Boolean)
+    {
+        submitButton.isEnabled = enable
+        submitButton.background =
+            ContextCompat.getDrawable(this@HomeActivity, if (enable) R.drawable.button_selected else R.drawable.button_default)
     }
 
     companion object

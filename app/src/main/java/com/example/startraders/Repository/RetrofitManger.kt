@@ -18,11 +18,12 @@ abstract class RetrofitManger<endpoint> {
     protected open val client = OkHttpClient.Builder().build()
 
     val retrofitBuilder by lazy {
-        val dispatcher=Dispatcher()
-        dispatcher.maxRequests=1
+        val dispatcher = Dispatcher()
+        dispatcher.maxRequests = 1
+
         val client = OkHttpClient.Builder().dispatcher(dispatcher).build()
-        Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create()).client(client).build()
-            .create(apiEndPoint)
+        client.connectTimeoutMillis()
+        Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create()).client(client).build().create(apiEndPoint)
 
     }
 

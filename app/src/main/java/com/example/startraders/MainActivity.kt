@@ -68,42 +68,16 @@ class MainActivity : AppCompatActivity()
 
         setContent {
             Greeting()
+
         }
+
         val isAlreadyLogin = RepositoryManager.sharedPrefData.getDataWithoutLiveData(this, IS_USER_LOGGED_IN, false)
         if (isAlreadyLogin)
         {
             startActivity(Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
             finish()
         }
-//
-//        RepositoryManager.retrofitObject.verifyUser("BALU1@GMAIL.COM",
-//                "BALUSL",
-//                object : RetrofitManger.ApiResponse {
-//                    override fun onResponseObtained(isSuccess : Boolean, responseData : Any?) {
-//
-//                        if (isSuccess) {
-//                            val loginResponse = responseData as LoginResponse
-//                            RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity,
-//                                    IS_USER_LOGGED_IN, true)
-//                            RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity,
-//                                    INVOICE_ID, data = loginResponse.newInvoice)
-//
-//                            RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity,
-//                                    COLLECTION_AGENT_ID, data = loginResponse.id)
-//
-//                            startActivity(Intent(this@MainActivity,
-//                                    HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-//                            finish()
-//                        }
-//                        else {
-//                            val errorMessage = responseData as String
-//                            Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
-//
-//                    }
-//
-//                })
+
     }
 
     @Preview
@@ -146,8 +120,8 @@ class MainActivity : AppCompatActivity()
                     .border(2.dp, Color.Transparent) // inner border
                     .padding(8.dp)) {
                     Column {
-                        Text(text = "Sign In", fontFamily = fontFamily, fontSize = 15.sp, color = Color.Black, fontWeight = FontWeight.Medium,
-                            modifier = Modifier.fillMaxWidth())
+                        Text(text = "Sign In", fontFamily = fontFamily, fontSize = 15.sp, color = Color.Black,
+                            fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth())
                     }
 
 
@@ -211,16 +185,18 @@ class MainActivity : AppCompatActivity()
                                 {
                                     val loginResponse = responseData as LoginResponse
                                     RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, IS_USER_LOGGED_IN, true)
-                                    RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, EXECUTIVE_NAME, loginResponse.name)
+                                    RepositoryManager.sharedPrefData.saveDataToDataStore(this@MainActivity, EXECUTIVE_NAME,
+                                        loginResponse.name)
 
 
                                     RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, INVOICE_ID,
-                                        data = getModifiedReceiptNumber(loginResponse.newInvoice,loginResponse.id,false))
+                                        data = getModifiedReceiptNumber(loginResponse.newInvoice, loginResponse.id, false))
 
                                     RepositoryManager.sharedPrefData.saveDataToDataStore<String>(this@MainActivity, COLLECTION_AGENT_ID,
                                         data = loginResponse.id)
 
-                                    startActivity(Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                                    startActivity(
+                                        Intent(this@MainActivity, HomeActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                                     finish()
                                 }
                                 else
@@ -243,13 +219,8 @@ class MainActivity : AppCompatActivity()
                     modifier = Modifier.padding(10.dp).padding(20.dp).fillMaxWidth(),
                     colors = ButtonDefaults.textButtonColors(backgroundColor = buttonColor), enabled = checkEnteredValues,
                     border = buttonBorder) {
-                    Text(
-                        text = "Submit",
-                        color = buttonTextColor,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(10.dp),
-                        )
+                    Text(text = "Submit", color = buttonTextColor, fontFamily = fontFamily, fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp))
                 }
 
             }

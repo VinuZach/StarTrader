@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -19,7 +20,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -85,7 +88,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
@@ -97,10 +99,8 @@
                     android:id="@+id/customername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:dropDownHeight="100dp"
                     android:fontFamily="@font/lexend_regular"
-
                     android:padding="10dp"
                     tools:ignore="LabelFor" />
 
@@ -110,10 +110,11 @@
                 android:id="@+id/outstandingpar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/outstandinglabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/outstanding_bal_label"
@@ -123,70 +124,207 @@
                     android:id="@+id/outstandingbal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="123"
                     android:paddingStart="20dp"
+                    android:text="123"
                     app:fontFamily="@font/lexend_extrabold" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp"
+                    android:src="@drawable/ic_refresh" />
             </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/lexend_medium"
-                android:text="@string/discount_request" />
 
-            <RadioGroup
-                android:id="@+id/radioGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-
-                android:paddingLeft="20dp">
-
-                <RadioButton
-                    android:id="@+id/radioyes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lexend_regular"
-                    android:padding="10dp"
-                    android:text="yes" />
-
-                <RadioButton
-                    android:id="@+id/radioNo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lexend_regular"
-                    android:padding="10dp"
-                    android:text="No" />
-
-            </RadioGroup>
 
             <LinearLayout
-                android:id="@+id/discountlayout"
+                android:id="@+id/hhhhh"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#94F8F8F8"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/discountdate"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="@font/lexend_medium"
+                    android:text="@string/discount_request" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/receipt_date"
-                    app:boxBackgroundColor="@android:color/white">
+                    android:orientation="horizontal"
 
-                    <AutoCompleteTextView
-                        android:id="@+id/prevrecieptdate"
-                        android:layout_width="match_parent"
+                    android:paddingLeft="20dp">
+
+                    <RadioButton
+                        android:id="@+id/radioyes"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:dropDownHeight="100dp"
-                        android:focusable="false"
                         android:fontFamily="@font/lexend_regular"
                         android:padding="10dp"
-                        tools:ignore="LabelFor" />
+                        android:text="yes" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+                    <RadioButton
+                        android:id="@+id/radioNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lexend_regular"
+                        android:padding="10dp"
+                        android:text="No" />
+
+                </RadioGroup>
+
+                <LinearLayout
+                    android:id="@+id/discountlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#94F8F8F8"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/discountdate"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/receipt_date"
+                        app:boxBackgroundColor="@android:color/white">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/prevrecieptdate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:dropDownHeight="100dp"
+                            android:focusable="false"
+                            android:fontFamily="@font/lexend_regular"
+                            android:padding="10dp"
+                            tools:ignore="LabelFor" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="@string/receipt_number"
+                        app:boxBackgroundColor="@android:color/white">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/prevrecieptno"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:dropDownHeight="100dp"
+                            android:focusable="false"
+                            android:fontFamily="@font/lexend_regular"
+                            android:padding="10dp"
+                            tools:ignore="LabelFor" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="@string/requested_amount"
+                        app:boxBackgroundColor="@android:color/white">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/prevrecieptamt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:padding="10dp"
+                            tools:ignore="LabelFor" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="@font/lexend_medium"
+                    android:text="Received Amount" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="15dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+                        <ToggleButton
+                            android:id="@+id/cashtoggle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_margin="10dp"
+                            android:background="@drawable/button_selection"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:fontFamily="@font/lexend_semibold"
+                            android:textColor="@drawable/button_selection"
+                            android:textOff="Cash"
+                            android:textOn="Cash" />
+
+
+                        <ToggleButton
+                            android:id="@+id/chequetoggle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_margin="10dp"
+
+                            android:background="@drawable/button_selection"
+                            android:focusable="false"
+
+                            android:focusableInTouchMode="false"
+                            android:fontFamily="@font/lexend_semibold"
+                            android:textColor="@drawable/button_selection"
+                            android:textOff="Cheque"
+                            android:textOn="Cheque" />
+
+                        <ToggleButton
+                            android:id="@+id/rtgstoggle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@drawable/button_selection"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:fontFamily="@font/lexend_semibold"
+                            android:textColor="@drawable/button_selection"
+                            android:textOff="RTGS"
+                            android:textOn="RTGS" />
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <include
+                    android:id="@+id/cashlayout"
+                    layout="@layout/layout_cash" />
+
+                <include
+                    android:id="@+id/chequelayout"
+                    layout="@layout/layout_cheque"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/rtgslayout"
+                    layout="@layout/layout_rtgs"
+                    android:visibility="gone" />
 
                 <com.google.android.material.textfield.TextInputLayout
 
@@ -194,163 +332,43 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:hint="@string/receipt_number"
+                    android:hint="Amount"
                     app:boxBackgroundColor="@android:color/white">
 
                     <AutoCompleteTextView
-                        android:id="@+id/prevrecieptno"
+                        android:id="@+id/totalamt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:dropDownHeight="100dp"
-                        android:focusable="false"
+                        android:enabled="false"
                         android:fontFamily="@font/lexend_regular"
-                        android:padding="10dp"
-                        tools:ignore="LabelFor" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:hint="@string/requested_amount"
-                    app:boxBackgroundColor="@android:color/white">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/prevrecieptamt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
                         android:padding="10dp"
                         tools:ignore="LabelFor" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:hint="Remark"
+                    app:boxBackgroundColor="@android:color/white">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/remark"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:dropDownHeight="100dp"
+                        android:fontFamily="@font/lexend_regular"
+                        android:padding="10dp"
+                        tools:ignore="LabelFor" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/lexend_medium"
-                android:text="Received Amount" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:layout_marginTop="15dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal">
-
-                    <ToggleButton
-                        android:id="@+id/cashtoggle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:layout_margin="10dp"
-                        android:background="@drawable/button_selection"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:fontFamily="@font/lexend_semibold"
-                        android:textColor="@drawable/button_selection"
-                        android:textOff="Cash"
-                        android:textOn="Cash" />
-
-
-                    <ToggleButton
-                        android:id="@+id/chequetoggle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:layout_margin="10dp"
-
-                        android:background="@drawable/button_selection"
-                        android:focusable="false"
-
-                        android:focusableInTouchMode="false"
-                        android:fontFamily="@font/lexend_semibold"
-                        android:textColor="@drawable/button_selection"
-                        android:textOff="Cheque"
-                        android:textOn="Cheque" />
-
-                    <ToggleButton
-                        android:id="@+id/rtgstoggle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/button_selection"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:fontFamily="@font/lexend_semibold"
-                        android:textColor="@drawable/button_selection"
-                        android:textOff="RTGS"
-                        android:textOn="RTGS" />
-
-
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <include
-                android:id="@+id/cashlayout"
-                layout="@layout/layout_cash" />
-
-            <include
-                android:id="@+id/chequelayout"
-                layout="@layout/layout_cheque"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/rtgslayout"
-                layout="@layout/layout_rtgs"
-                android:visibility="gone" />
-
-            <com.google.android.material.textfield.TextInputLayout
-
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="Amount"
-                app:boxBackgroundColor="@android:color/white">
-
-                <AutoCompleteTextView
-                    android:id="@+id/totalamt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:dropDownHeight="100dp"
-                    android:enabled="false"
-                    android:fontFamily="@font/lexend_regular"
-                    android:inputType="numberDecimal"
-                    android:padding="10dp"
-                    tools:ignore="LabelFor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="Remark"
-                app:boxBackgroundColor="@android:color/white">
-
-                <AutoCompleteTextView
-                    android:id="@+id/remark"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:dropDownHeight="100dp"
-                    android:fontFamily="@font/lexend_regular"
-                    android:padding="10dp"
-                    tools:ignore="LabelFor" />
-
-            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/submit"
@@ -391,4 +409,6 @@
             android:text="@string/retrieving_customer_list"
             android:textSize="20dp" />
     </RelativeLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

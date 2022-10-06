@@ -325,42 +325,42 @@ object RetrofitMethods : RetrofitManger<ApiEndPoints>()
 
     private fun callUploadReceipt(partList: MutableList<MultipartBody.Part>, apiResponse: ApiResponse)
     {
+        apiResponse.onResponseObtained(true, "")
 
-
-        retrofitBuilder.uploadReceipt(partList).enqueue(object : Callback<ArrayList<BaseResponse>>
-        {
-            override fun onResponse(call: Call<ArrayList<BaseResponse>>, response: Response<ArrayList<BaseResponse>>)
-            {
-                Log.d(TAG, "onResponse: uploadReceipt " + response.toString())
-                if (response.isSuccessful)
-                {
-
-
-                    try
-                    {
-
-                        val baseRespose = response.body()?.get(0)
-                        Log.d(TAG, "onResponse: uploadReceipt " + baseRespose.toString())
-                        if (baseRespose?.status == "true")
-                        {
-                            apiResponse.onResponseObtained(true, baseRespose)
-
-                        }
-                        else apiResponse.onResponseObtained(false, "Request not uploaded ")
-                    } catch (e: Exception)
-                    {
-                        apiResponse.onResponseObtained(false, "Response not obtained")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<ArrayList<BaseResponse>>, t: Throwable)
-            {
-                Log.d(TAG, "onFailure: uploadReceipt " + t.message)
-                apiResponse.onResponseObtained(false, "Sever connection error")
-            }
-
-        })
+//        retrofitBuilder.uploadReceipt(partList).enqueue(object : Callback<ArrayList<BaseResponse>>
+//        {
+//            override fun onResponse(call: Call<ArrayList<BaseResponse>>, response: Response<ArrayList<BaseResponse>>)
+//            {
+//                Log.d(TAG, "onResponse: uploadReceipt " + response.toString())
+//                if (response.isSuccessful)
+//                {
+//
+//
+//                    try
+//                    {
+//
+//                        val baseRespose = response.body()?.get(0)
+//                        Log.d(TAG, "onResponse: uploadReceipt " + baseRespose.toString())
+//                        if (baseRespose?.status == "true")
+//                        {
+//                            apiResponse.onResponseObtained(true, baseRespose)
+//
+//                        }
+//                        else apiResponse.onResponseObtained(false, "Request not uploaded ")
+//                    } catch (e: Exception)
+//                    {
+//                        apiResponse.onResponseObtained(false, "Response not obtained")
+//                    }
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<ArrayList<BaseResponse>>, t: Throwable)
+//            {
+//                Log.d(TAG, "onFailure: uploadReceipt " + t.message)
+//                apiResponse.onResponseObtained(false, "Sever connection error")
+//            }
+//
+//        })
     }
 
     fun retrieveCustomerDiscountDate(customerName: String, apiResponse: ApiResponse)

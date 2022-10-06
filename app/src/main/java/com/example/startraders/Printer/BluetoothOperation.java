@@ -34,7 +34,8 @@ public class BluetoothOperation implements IPrinterOpertion {
 	private boolean hasRegDisconnectReceiver;
 	private IntentFilter filter;
 
-	public BluetoothOperation(Context context, Handler handler) {
+
+    public BluetoothOperation(Context context, Handler handler) {
 		adapter = BluetoothAdapter.getDefaultAdapter();
 		mContext = context;
 		mHandler = handler;
